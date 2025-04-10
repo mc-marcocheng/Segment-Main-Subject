@@ -33,3 +33,16 @@ def keep_mask_regions_only(image_rgb, masks):
         blank_image[mask] = image_rgb[mask]
 
     return blank_image
+
+def create_rgba_masked_image(image_rgb, masks):
+    # Initialize an RGBA image with alpha channel set to 0 (fully transparent)
+    h, w, _ = image_rgb.shape
+    rgba_image = np.zeros((h, w, 4), dtype=image_rgb.dtype)
+
+    # Loop over each mask and fill the corresponding areas in the RGBA image
+    for mask in masks:
+        mask = mask.astype(bool)
+        rgba_image[mask, :3] = image_rgb[mask]  # Copy RGB colors
+        rgba_image[mask, 3] = 255  # Set alpha to 255 (fully opaque) in the masked regions
+
+    return rgba_image

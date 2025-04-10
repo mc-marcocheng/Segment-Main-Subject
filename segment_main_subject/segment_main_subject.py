@@ -82,12 +82,3 @@ class SegmentMainSubject:
                     }
                 )
         return all_results
-
-
-if __name__ == "__main__":
-    model = SegmentMainSubject()
-    out = model.predict(
-        [Image.open("/HDD_1/project_active/segment-main-subject/assets/car.jpeg"), Image.open("/HDD_1/project_active/segment-main-subject/assets/car.jpeg")],
-        # ["car", "wheel"],
-    )
-    print(out)

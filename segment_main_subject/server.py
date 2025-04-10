@@ -10,7 +10,7 @@ from loguru import logger
 from PIL import Image
 
 from .segment_main_subject import SegmentMainSubject
-from .utils import draw_image, keep_mask_regions_only
+from .utils import create_rgba_masked_image, draw_image
 
 PORT = os.environ.get("PORT", 8765)
 
@@ -114,8 +114,8 @@ text_prompt: {inputs['text_prompt']}"
 
         # Draw results on the image
         image_array = np.asarray(image_pil)
-        output_image = keep_mask_regions_only(image_array, results["masks"])
-        output_image = Image.fromarray(np.uint8(output_image)).convert("RGB")
+        output_image = create_rgba_masked_image(image_array, results["masks"])
+        output_image = Image.fromarray(np.uint8(output_image), mode="RGBA")
         outputs = {"output_image": output_image, "text_prompt": inputs["text_prompt"]}
 
         # Gradio app visualization

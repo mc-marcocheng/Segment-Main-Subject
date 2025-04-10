@@ -43,7 +43,7 @@ def inference(vllm_base_url, sam_type, max_threshold, text_threshold, image, tex
         try:
             image_data = base64.b64decode(response_json["image"])
             annotation_image_data = base64.b64decode(response_json["annotation_image"])
-            output_image = Image.open(BytesIO(image_data)).convert("RGB")
+            output_image = Image.open(BytesIO(image_data)).convert("RGBA")
             annotation_image = Image.open(BytesIO(annotation_image_data)).convert("RGB")
             text_prompt = response_json["text_prompt"]
             return output_image, annotation_image, text_prompt
@@ -58,16 +58,21 @@ examples = [
     [
         os.path.join(os.path.dirname(__file__), "assets", "fruits.jpg"),
         "kiwi. watermelon. blueberry.",
+        0.31,
     ],
     [
         os.path.join(os.path.dirname(__file__), "assets", "car.jpeg"),
         "wheel.",
+        0.5,
     ],
     [
         os.path.join(os.path.dirname(__file__), "assets", "food.jpg"),
         "",
+        0.5
     ],
 ]
+
+max_threshold = gr.Slider(minimum=0.0, maximum=1.0, value=0.5, label="Max Threshold", render=False)
 
 with gr.Blocks(title="Segment Main Subject", analytics_enabled=False) as blocks:
     with gr.Tab("Inference"):
@@ -81,13 +86,13 @@ with gr.Blocks(title="Segment Main Subject", analytics_enabled=False) as blocks:
                 output_annotation = gr.Image(type="pil", label="Output Annotation")
         gr.Examples(
             examples=examples,
-            inputs=[image_input, text_prompt],
+            inputs=[image_input, text_prompt, max_threshold],
         )
 
     with gr.Tab("Settings"):
         vllm_base_url_textbox = gr.Textbox("http://localhost:8000/v1", label="vLLM base URL")
         sam_model_choices = gr.Dropdown(choices=list(SAM_MODELS.keys()), label="SAM Model", value="sam2.1_hiera_small")
-        max_threshold = gr.Slider(minimum=0.0, maximum=1.0, value=0.5, label="Max Threshold")
+        max_threshold.render()
         text_threshold = gr.Slider(minimum=0.0, maximum=1.0, value=0.25, label="Text Threshold")
 
     submit_btn.click(
